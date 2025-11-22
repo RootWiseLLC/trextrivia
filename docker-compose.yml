@@ -37,6 +37,9 @@ services:
       dockerfile: Dockerfile
     expose:
       - "80"
+    labels:
+      - "coolify.managed=true"
+      - "coolify.port=80"
 
 volumes:
   postgres_data:
