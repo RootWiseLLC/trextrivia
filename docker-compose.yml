@@ -28,15 +28,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
 
   frontend:
     image: nginx:alpine
     volumes:
       - ./fe-jeopardy/dist/jeopardy:/usr/share/nginx/html:ro
-    ports:
-      - "80:80"
+    expose:
+      - "80"
 
 volumes:
   postgres_data:
