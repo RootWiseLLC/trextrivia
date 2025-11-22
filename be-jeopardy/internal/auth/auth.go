@@ -17,17 +17,38 @@ var (
 )
 
 func SetJWTKeys() error {
+	// Try reading from environment variables first (for production/cloud deployments)
 	privateKeyStr := os.Getenv("JWT_RS512_KEY")
-	privateKeyBytes := []byte(privateKeyStr)
-
+	var privateKeyBytes []byte
 	var err error
+
+	if privateKeyStr != "" {
+		privateKeyBytes = []byte(privateKeyStr)
+	} else {
+		// Fall back to reading from .keys directory (for local development)
+		privateKeyBytes, err = os.ReadFile(".keys/jwtRS512.key")
+		if err != nil {
+			return fmt.Errorf("failed to read private key: %w", err)
+		}
+	}
+
 	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
 	if err != nil {
 		return err
 	}
 
 	publicKeyStr := os.Getenv("JWT_RS512_PUB_KEY")
-	publicKeyBytes := []byte(publicKeyStr)
+	var publicKeyBytes []byte
+
+	if publicKeyStr != "" {
+		publicKeyBytes = []byte(publicKeyStr)
+	} else {
+		// Fall back to reading from .keys directory (for local development)
+		publicKeyBytes, err = os.ReadFile(".keys/jwtRS512.key.pub")
+		if err != nil {
+			return fmt.Errorf("failed to read public key: %w", err)
+		}
+	}
 
 	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
 	if err != nil {

@@ -1,15 +1,15 @@
 <div class='modal-container'>
     <div class='modal-message'>
-        <h3>Jeopardy Configuration</h3>
+        <h3>Game Configuration</h3>
         <div id='config-inputs' class='flex-row'>
             <div class='game-inputs'>
                 <div *ngIf="!user.authenticated">
                     <input id="player-name-config" type="text" [(ngModel)]="user.name" placeholder="Enter your name">
                 </div>
                 <div>
-                    <input type="checkbox" id="one-round-config" [(ngModel)]="oneRoundChecked" (change)="twoRoundChecked = !oneRoundChecked">
+                    <input type="radio" id="one-round-config" name="rounds" [value]="true" [(ngModel)]="oneRoundChecked">
                     <label for="one-round-config" style="margin-right: 1em;">1 Round</label>
-                    <input type="checkbox" id="two-round-config" [(ngModel)]="twoRoundChecked" (change)="oneRoundChecked = !twoRoundChecked">
+                    <input type="radio" id="two-round-config" name="rounds" [value]="false" [(ngModel)]="oneRoundChecked">
                     <label for="two-round-config">2 Rounds</label>
                 </div>
                 <div>
@@ -77,7 +77,7 @@
         </div>
     </div>
     <div id="config-buttons" class='flex-row'>
+        <button class="secondary" (click)="hideConfig()">Cancel</button>
         <button (click)="createPrivateGame(botConfig)">Start Game</button>
-        <button (click)="hideConfig()">Exit</button>
     </div>
 </div>

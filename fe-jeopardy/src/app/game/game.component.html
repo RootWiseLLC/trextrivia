@@ -26,17 +26,15 @@
 <app-reactions></app-reactions>
 
 <div id='game-controls'>
-	<div id='jeopardy-music' class='game-control'>
+	<!-- Music control only shown during Final Jeopardy -->
+	<div id='jeopardy-music' *ngIf="game.FinalRound()" class='game-control'>
 		<ion-icon (click)="stopMusic()" *ngIf="playMusic" name="volume-high-outline"></ion-icon>
 		<ion-icon (click)="startMusic()" *ngIf="!playMusic" name="volume-mute-outline"></ion-icon>
-		<div class='control-info' *ngIf="showMusicInfo">
-			<p><ion-icon name="chevron-back-outline"></ion-icon> Click for Jeopardy music</p>
-		</div>
 		<audio loop #jeopardyAudio>
 			<source src="../../assets/jeopardy_music.mp3" />
 		</audio>
 	</div>
-	
+
 	<div id='pause-game' *ngIf='!game.InDispute() && !game.PreGame()' class='game-control'>
 		<ion-icon (click)="pauseGame(false)" *ngIf="game.IsPaused() && !game.Disconnected()" name="play"></ion-icon>
 		<ion-icon (click)="pauseGame(true)" *ngIf="!game.IsPaused()" name="pause"></ion-icon>

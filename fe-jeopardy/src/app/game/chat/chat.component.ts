@@ -36,7 +36,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 			if (resp.code >= 4400) {
 				console.error(resp.message)
 				this.messages.push({
-					username: 'Jeopardy System',
+					username: 'T-Rex System',
 					message: resp.message,
 					timestamp: resp.timeStamp,
 				})

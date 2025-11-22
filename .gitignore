@@ -1,2 +1,10 @@
 .vscode/
 **/*.tsv
+
+.env
+
+# Startup script artifacts
+*.log
+.backend.pid
+.frontend.pid
+logs/

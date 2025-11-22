@@ -4,3 +4,4 @@ bin/
 **/*.tsv
 clues/
 mt_questions/
+logs/

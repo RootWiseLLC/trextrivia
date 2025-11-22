@@ -1,45 +1,51 @@
-<div class='join-container flex-column'>
-    <div class='flex-column gap15'>
-        <input *ngIf="!user.authenticated" id="player-name-join" type="text" [(ngModel)]="user.name" placeholder="Enter your name">
-        <p style='margin: 0;' *ngIf="user.authenticated">Welcome, {{user.name}}</p>
-
-        <div class='flex-row gap15'>
-            <!-- <button (click)="joinPublicGame()">Join public game</button> -->
-            <button (click)="createPrivateGame(0)">Start a new game</button>
-            <button (click)="toggleJoinCodeInput()">Join game by code</button>
-        </div>
-        <div class='flex-row gap15'>
-            <div class='flex-column game-inputs'>
-                <div>
-                    <input type="checkbox" id="one-round" [(ngModel)]="oneRoundChecked" (change)="twoRoundChecked = !oneRoundChecked">
-                    <label for="one-round" style="margin-right: 1em;">1 Round</label>
-                    <input type="checkbox" id="two-round" [(ngModel)]="twoRoundChecked" (change)="oneRoundChecked = !twoRoundChecked">
-                    <label for="two-round">2 Rounds</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="penalty-input" [(ngModel)]="penaltyChecked">
-                    <label for='penalty-input'>Penalty for incorrect answers</label>
-                </div>
-                <div>
-                    <button id='advanced-options' (click)="modal.displayConfig()">+</button><span> Advanced options</span>
-                </div>
-            </div>
-            <div>
-                <input id="game-code" *ngIf="showJoinCodeInput" (keydown.enter)="joinGameByCode()" type="text" [(ngModel)]="joinCode" placeholder="Game code">
-            </div>
-        </div>
+<div class='join-container-wrapper flex-row'>
+    <div class='graphic-container'>
+        <img src="assets/graphic.jpg" alt="Jeopardy graphic">
     </div>
 
-    <hr>
+    <div class='join-container flex-column'>
+        <div class='flex-column gap15'>
+            <input *ngIf="!user.authenticated" id="player-name-join" type="text" [(ngModel)]="user.name" placeholder="Enter your name">
+            <p style='margin: 0;' *ngIf="user.authenticated">Welcome, {{user.name}}</p>
 
-    <div id='bots-container' class='flex-column'>
-        <button (click)="createPrivateGame(2)">Play against bots</button>
-        <p>No one to play with right now? Play against the Jeopardy bots.</p>
+            <div class='flex-row gap15'>
+                <!-- <button (click)="joinPublicGame()">Join public game</button> -->
+                <button (click)="createPrivateGame(0)">Start a new game</button>
+                <button (click)="toggleJoinCodeInput()">Join game by code</button>
+            </div>
+            <div class='flex-row gap15'>
+                <div class='flex-column game-inputs'>
+                    <div>
+                        <input type="checkbox" id="one-round" [(ngModel)]="oneRoundChecked" (change)="twoRoundChecked = !oneRoundChecked">
+                        <label for="one-round" style="margin-right: 1em;">1 Round</label>
+                        <input type="checkbox" id="two-round" [(ngModel)]="twoRoundChecked" (change)="oneRoundChecked = !twoRoundChecked">
+                        <label for="two-round">2 Rounds</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="penalty-input" [(ngModel)]="penaltyChecked">
+                        <label for='penalty-input'>Penalty for incorrect answers</label>
+                    </div>
+                    <div>
+                        <button id='advanced-options' (click)="modal.displayConfig()">+</button><span> Advanced options</span>
+                    </div>
+                </div>
+                <div>
+                    <input id="game-code" *ngIf="showJoinCodeInput" (keydown.enter)="joinGameByCode()" type="text" [(ngModel)]="joinCode" placeholder="Game code">
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div id='bots-container' class='flex-column'>
+            <button (click)="createPrivateGame(2)">Play against bots</button>
+            <p>No one to play with right now? Play against the T-Rex bots.</p>
+        </div>
+
+        <hr>
+
+        <button (click)="rejoin()">Disconnected? Click to rejoin</button>
     </div>
-    
-    <hr>
-    
-    <button (click)="rejoin()">Disconnected? Click to rejoin</button>
 </div>
 
 <app-config *ngIf="modal.showConfig()" [user]="user" [oneRoundChecked]="oneRoundChecked" [twoRoundChecked]="twoRoundChecked" [penaltyChecked]="penaltyChecked"></app-config>
