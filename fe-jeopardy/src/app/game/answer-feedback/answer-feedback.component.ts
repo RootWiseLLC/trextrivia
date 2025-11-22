@@ -26,10 +26,11 @@ export class AnswerFeedbackComponent implements OnInit, OnDestroy {
         // Play sound effect based on feedback type
         this.playSound();
 
-        // Auto-hide after 1 second
+        // Auto-hide after 1 second (or 3 seconds for birthday)
+        const hideDelay = this.isBirthday() ? 3000 : 1000;
         this.hideTimeout = setTimeout(() => {
             this.modal.hideAnswerFeedback();
-        }, 1000);
+        }, hideDelay);
     }
 
     ngOnDestroy() {
@@ -39,18 +40,15 @@ export class AnswerFeedbackComponent implements OnInit, OnDestroy {
     }
 
     playSound() {
-        // Check if music/sound is enabled
-        const playMusic = localStorage.getItem('playMusic') !== 'false';
-
-        if (playMusic) {
-            if (this.isDailyDouble()) {
-                this.dailyDoubleAudio.play().catch(err => console.log('Audio play failed:', err));
-            } else if (this.isCorrect()) {
-                this.correctAudio.play().catch(err => console.log('Audio play failed:', err));
-            } else {
-                this.wrongAudio.play().catch(err => console.log('Audio play failed:', err));
-            }
+        // Sound effects are always enabled (independent of background music setting)
+        if (this.isDailyDouble()) {
+            this.dailyDoubleAudio.play().catch(err => console.log('Audio play failed:', err));
+        } else if (this.isCorrect()) {
+            this.correctAudio.play().catch(err => console.log('Audio play failed:', err));
+        } else if (!this.isBirthday()) {
+            this.wrongAudio.play().catch(err => console.log('Audio play failed:', err));
         }
+        // Birthday message plays no sound
     }
 
     isCorrect(): boolean {
@@ -71,5 +69,10 @@ export class AnswerFeedbackComponent implements OnInit, OnDestroy {
     isDailyDouble(): boolean {
         const feedbackType = this.modal.getAnswerFeedbackType();
         return feedbackType === 'daily-double';
+    }
+
+    isBirthday(): boolean {
+        const feedbackType = this.modal.getAnswerFeedbackType();
+        return feedbackType === 'birthday';
     }
 }

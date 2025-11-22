@@ -6,6 +6,7 @@ import { ApiService } from '../services/api.service'
 import { AuthService } from '../services/auth.service'
 import { JwtService } from '../services/jwt.service'
 import { ModalService } from '../services/modal.service'
+import { environment } from '../../environments/environment'
 
 @Component({
 	selector: 'app-join',
@@ -32,6 +33,13 @@ export class JoinComponent implements OnInit {
 		this.auth.user.subscribe(user => {
 			this.user = user
 		})
+
+		// Show birthday message for Tera (if enabled in environment config)
+		if (environment.showBirthdayMessage) {
+			setTimeout(() => {
+				this.modal.displayAnswerFeedback('birthday')
+			}, 500)
+		}
 	}
 
 	private joinResp(): Partial<Observer<any>> {

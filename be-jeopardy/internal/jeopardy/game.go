@@ -440,7 +440,7 @@ func (g *Game) processProtest(protestByPlayer GamePlayer, protestFor string) err
 	protestForPlayer.addToScore(adjustment)
 	protestForPlayer.setFinalCorrect(!protestForPlayer.finalCorrect())
 	g.setState(PostGame, &Player{})
-	g.messageAllPlayers("Final Jeopardy result changed")
+	g.messageAllPlayers("Final Trivia result changed")
 	return nil
 }
 

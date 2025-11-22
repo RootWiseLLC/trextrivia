@@ -1,5 +1,5 @@
 <div>
-    <p class="final-answer">Final Jeopardy Answer: <b>{{ game.OfficialAnswer() }}</b></p>
+    <p class="final-answer">Final Trivia Answer: <b>{{ game.OfficialAnswer() }}</b></p>
 
     <div *ngFor="let p of game.Players()">
         <div class='player-answer' *ngIf="p.finalAnswer != '' && isPlayerRevealed(p.id)">

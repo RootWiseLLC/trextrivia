@@ -111,4 +111,4 @@ export type Reaction = {
     randPos: number;
 }
 
-export let ServerUnavailableMsg = 'Sorry, Jeopardy is not available right now. Please try again later.'
+export let ServerUnavailableMsg = 'Sorry, T-Rex Trivia is not available right now. Please try again later.'

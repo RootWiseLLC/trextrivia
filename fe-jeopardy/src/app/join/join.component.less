@@ -1,5 +1,38 @@
+.join-container-wrapper {
+    gap: 96px;
+    align-items: center;
+    justify-content: center;
+
+    // Override the global flex: 1 rule to prevent stretching
+    .graphic-container,
+    .join-container {
+        flex: 0 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+}
+
+.graphic-container {
+    img {
+        max-width: 400px;
+        max-height: 500px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+
+        @media (max-width: 768px) {
+            max-width: 100%;
+            max-height: 300px;
+        }
+    }
+}
+
 .join-container {
     gap: 30px;
+    margin: 0 !important;
+    margin-top: calc(var(--header-height) + 30px) !important;
 
     .gap15 {
         gap: 15px;
@@ -24,7 +57,7 @@
         }
     }
 
-    
+
     hr {
         margin: 0;
     }

@@ -14,7 +14,7 @@ export class ModalService {
 	register: boolean
 	login: boolean
 	answerFeedback: boolean
-	answerFeedbackType: 'correct' | 'incorrect' | 'timeout' | 'daily-double' = 'correct'
+	answerFeedbackType: 'correct' | 'incorrect' | 'timeout' | 'daily-double' | 'birthday' = 'correct'
 
 	constructor(private game: GameStateService) { }
 
@@ -147,7 +147,7 @@ export class ModalService {
 		return this.login
 	}
 
-	displayAnswerFeedback(type: 'correct' | 'incorrect' | 'timeout' | 'daily-double' = 'correct') {
+	displayAnswerFeedback(type: 'correct' | 'incorrect' | 'timeout' | 'daily-double' | 'birthday' = 'correct') {
 		this.answerFeedbackType = type
 		this.answerFeedback = true
 	}
@@ -160,7 +160,7 @@ export class ModalService {
 		return this.answerFeedback
 	}
 
-	getAnswerFeedbackType(): 'correct' | 'incorrect' | 'timeout' | 'daily-double' {
+	getAnswerFeedbackType(): 'correct' | 'incorrect' | 'timeout' | 'daily-double' | 'birthday' {
 		return this.answerFeedbackType
 	}
 }

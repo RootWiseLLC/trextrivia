@@ -13,13 +13,16 @@ import { ModalService } from 'src/app/services/modal.service';
 export class ConfigComponent {
 	@Input() user: User
 	@Input() oneRoundChecked: boolean = true
-	@Input() twoRoundChecked: boolean = false
 	@Input() penaltyChecked: boolean = true
+
+	get twoRoundChecked(): boolean {
+		return !this.oneRoundChecked
+	}
 	protected botConfig: number = 0
-	protected pickConfig: number = 30
-	protected buzzConfig: number = 30
-	protected answerConfig: number = 15
-	protected wagerConfig: number = 30
+	protected pickConfig: number = 20
+	protected buzzConfig: number = 20
+	protected answerConfig: number = 12
+	protected wagerConfig: number = 20
 	protected firstRoundCategories: any[] = []
 	protected secondRoundCategories: any[] = []
 	protected searchResults: any[] = []

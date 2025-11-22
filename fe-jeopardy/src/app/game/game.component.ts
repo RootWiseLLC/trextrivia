@@ -125,9 +125,6 @@ export class GameComponent implements OnInit {
 			    this.game.State() !== GameState.RecvAns &&
 			    this.game.OfficialAnswer() !== '' &&
 			    !this.game.FinalRound()) {
-				// Store playMusic state in localStorage so answer-feedback component can access it
-				localStorage.setItem('playMusic', this.playMusic.toString())
-
 				// Determine feedback type based on answer
 				let feedbackType: 'correct' | 'incorrect' | 'timeout' = 'incorrect'
 				if (this.game.AnsCorrectness()) {
@@ -144,8 +141,6 @@ export class GameComponent implements OnInit {
 			    this.game.State() === GameState.RecvPick &&
 			    this.game.OfficialAnswer() !== '' &&
 			    !this.game.FinalRound()) {
-				// Store playMusic state in localStorage so answer-feedback component can access it
-				localStorage.setItem('playMusic', this.playMusic.toString())
 				this.modal.displayAnswerFeedback('timeout')
 			}
 
@@ -153,12 +148,26 @@ export class GameComponent implements OnInit {
 			if (this.game.State() === GameState.RecvWager &&
 			    previousState !== GameState.RecvWager &&
 			    !this.game.FinalRound()) {
-				localStorage.setItem('playMusic', this.playMusic.toString())
 				this.modal.displayAnswerFeedback('daily-double')
 			}
 
 			this.previousState = this.game.State()
 			this.handleScoreChanges(savedPlayers)
+
+			// Start music when Final Jeopardy begins (transitioning to RecvWager in Final Round)
+			if (this.game.State() === GameState.RecvWager &&
+			    this.game.FinalRound() &&
+			    previousState !== GameState.RecvWager) {
+				this.startMusic()
+			}
+
+			// Stop music when leaving Final Jeopardy
+			if (previousState === GameState.RecvWager &&
+			    this.game.FinalRound() &&
+			    this.game.State() !== GameState.RecvWager &&
+			    this.game.State() !== GameState.RecvAns) {
+				this.stopMusic()
+			}
 
 			switch (this.game.State()) {
 				case GameState.PreGame:

@@ -1,5 +1,6 @@
 <div class='toolbar flex-row' role="banner">
-	<div>
+	<div class='flex-row' style='align-items: center; gap: 0.5em; overflow: hidden; height: 100%;'>
+		<img src="assets/trex-profile.jpg" alt="T-Rex" class="app-icon">
 		<h2>T-Rex Trivia</h2>
 	</div>
 	<div id='header-icons' class='flex-row'>
@@ -10,32 +11,6 @@
 		</div>
 		<div>
 			<ion-icon (click)="modal.displayInstructions()" name="information-circle-outline"></ion-icon>
-		</div>
-		<div>
-			<ion-icon (click)="router.navigate(['/leaderboards'])" name="list-outline"></ion-icon>
-		</div>
-		<div>
-			<a target="_blank" href='https://docs.google.com/forms/d/e/1FAIpQLSdzHFumIhdsgNksr8lDUO3hHhVwaIqeO9asIhBWsroNfYZW4Q/viewform'>
-				<ion-icon name="pencil-outline"></ion-icon>
-			</a>
-		</div>
-		<div style='position: relative;'>
-			<div (click)="showAuthOptions = !showAuthOptions">
-				<ion-icon *ngIf="!user.authenticated" name="log-in-outline"></ion-icon>
-				<img *ngIf="user.authenticated" [src]="user.imgUrl" alt="">
-			</div>
-			<div *ngIf="showAuthOptions" id="auth-options" [@slideDownUp]>
-				<div *ngIf="!user.authenticated"  class='flex-column'>
-					<app-auth-button (click)="signIn('google')"  [buttonText]="'Sign in with Google'" [imgUrl]="'../../../assets/google.png'"></app-auth-button>
-					<app-auth-button (click)="signIn('github')"  [buttonText]="'Sign in with GitHub'" [imgUrl]="'../../../assets/github.png'"></app-auth-button>
-					<app-auth-button (click)="startLogin()"  [buttonText]="'Sign in with email'" [imgUrl]="''" [iconName]="'email'"></app-auth-button>
-					<app-auth-button (click)="startRegistration()"  [buttonText]="'Create an account'" [imgUrl]="''" [iconName]="'sign-up'"></app-auth-button>
-				</div>
-				<div *ngIf="user.authenticated" class='flex-column'>
-					<app-auth-button (click)="goToProfile()" [buttonText]="'Profile'" [imgUrl]="''" [iconName]="'profile'"></app-auth-button>
-					<app-auth-button (click)="signOut()" [buttonText]="'Sign out'" [imgUrl]="''" [iconName]="'sign-out'"></app-auth-button>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>
