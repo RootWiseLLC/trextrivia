@@ -3,7 +3,7 @@
 *.spec.ts
 
 # Compiled output
-/dist
+# /dist allow for GitHub Actions build
 /tmp
 /out-tsc
 /bazel-out
