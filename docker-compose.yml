@@ -41,5 +41,22 @@ services:
       - "coolify.managed=true"
       - "coolify.port=80"
 
+  scraper:
+    build:
+      context: ./be-jeopardy
+      dockerfile: Dockerfile.scraper
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres?sslmode=disable
+    volumes:
+      - ./be-jeopardy/clues:/app/clues
+      - ./be-jeopardy/scrapers:/app/scrapers
+      - ./be-jeopardy/insert_clues.py:/app/insert_clues.py
+      - ./be-jeopardy/add_alternatives.py:/app/add_alternatives.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - tools
+
 volumes:
   postgres_data:

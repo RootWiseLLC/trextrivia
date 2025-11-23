@@ -60,19 +60,12 @@ JWT_PUBLIC_KEY=paste_base64_encoded_public_key_here
 
 ### Configure Domains:
 
-Add `trextrivia.com` to both services:
+Only the **frontend service** (nginx static site) needs a public domain. Set:
 
-1. **Backend service**:
-   - Domain: `trextrivia.com`
-   - Port: `8080`
+- Domain: `trextrivia.com`
+- Port: `80`
 
-2. **Frontend service**:
-   - Domain: `trextrivia.com`
-   - Port: `80`
-
-Traefik will route:
-- `/jeopardy/*` → Backend (API + WebSockets)
-- `/*` → Frontend (static files)
+Keep the backend service private; the nginx container already proxies `/jeopardy/*` traffic to the Go server over the internal Docker network, so Traefik never needs to reach the backend directly. If you prefer Traefik to talk to the backend, use a **different** hostname (for example `api.trextrivia.com`) or add a `PathPrefix(/jeopardy)` rule so it only receives API/WebSocket calls. Reusing the same host for both services will cause random 404s because Traefik may route `/` to the backend, which has no handlers for non-`/jeopardy/*` paths.
 
 ### Deploy:
 

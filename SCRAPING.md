@@ -31,19 +31,15 @@ mv scrapers/*.tsv clues/
 ### Using Docker (On Server)
 
 ```bash
-# Build scraper image
-docker build -f be-jeopardy/Dockerfile.scraper -t jeopardy-scraper be-jeopardy
+# Build scraper image that ships with the main docker-compose.yml
+docker compose --profile tools build scraper
 
-# Run scraper (connects to existing postgres container)
-docker run --rm \
-  --network jeopardy_default \
-  -e DATABASE_URL="postgresql://postgres:yourpassword@postgres:5432/postgres?sslmode=disable" \
-  -v $(pwd)/be-jeopardy/clues:/app/clues \
-  jeopardy-scraper jeopardy
+# Run scraper (connects to the postgres service defined in docker-compose.yml)
+docker compose --profile tools run --rm scraper jeopardy
 
 # Or use different scraper:
-docker run ... jeopardy-scraper jetpunk
-docker run ... jeopardy-scraper opentdb
+docker compose --profile tools run --rm scraper jetpunk
+docker compose --profile tools run --rm scraper opentdb
 ```
 
 ### On Coolify Server
@@ -54,9 +50,9 @@ SSH into your Coolify server and run:
 # Navigate to your deployed app directory
 cd /path/to/jeopardy
 
-# Run scraper using docker-compose
-docker compose -f docker-compose.scraper.yml build scraper
-docker compose -f docker-compose.scraper.yml run --rm scraper jeopardy
+# Run scraper using the same docker-compose.yml that Coolify deploys
+docker compose --profile tools build scraper
+docker compose --profile tools run --rm scraper jeopardy
 ```
 
 ## Available Scrapers
