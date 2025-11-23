@@ -1,6 +1,7 @@
 import csv
 import re
 from datetime import datetime
+from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
@@ -36,6 +37,9 @@ assert (len(tables) == 1)
 
 rows = tables[0].find_all('tr')
 print('number of games', len(rows))
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+OUTPUT_FILE = SCRIPT_DIR / 'season40.tsv'
 
 questions = []
 
@@ -115,7 +119,7 @@ for row in rows:
 
     print()
 
-with open('season40.tsv', 'w') as file:
+with open(OUTPUT_FILE, 'w') as file:
     csv_writer = csv.writer(file, delimiter='\t')
     headers = ['round', 'clue_value', 'daily_double_value', 'category',
                'comments', 'answer', 'question', 'air_date', 'notes']
