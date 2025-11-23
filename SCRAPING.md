@@ -40,11 +40,11 @@ docker compose -f docker-compose.scraper.yml run --rm scraper jeopardy
 
 # 2. Copy the TSV to the server
 scp be-jeopardy/clues/jeopardy_seasons_30_40.tsv \
-    root@5.161.234.29:/data/coolify/applications/ps0cc4c8cw0okc0cg8ogs840/be-jeopardy/clues/
+    root@<SERVER_IP>:/data/coolify/applications/<COOLIFY_APP_ID>/be-jeopardy/clues/
 
 # 3. Load the TSV into the production database
 # on server...
-cd /data/coolify/applications/ps0cc4c8cw0okc0cg8ogs840
+cd /data/coolify/applications/<COOLIFY_APP_ID>
 docker compose -f docker-compose.scraper.yml run --rm \
   --entrypoint bash \
   scraper -c "python insert_clues.py && python add_alternatives.py"
