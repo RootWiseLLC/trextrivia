@@ -4,7 +4,7 @@ The scraping system is **completely separate** from the main deployment. You can
 
 ## Quick Start
 
-### Local Development (Recommended)
+### Local Development
 
 ```bash
 # 1. Start PostgreSQL
@@ -28,27 +28,13 @@ mv scrapers/*.tsv clues/
 .venv/bin/python add_alternatives.py
 ```
 
-### Using Docker (On Server)
-
-```bash
-# Build scraper image that ships with the main docker-compose.yml
-docker compose --profile tools build scraper
-
-# Run scraper (connects to the postgres service defined in docker-compose.yml)
-docker compose --profile tools run --rm scraper jeopardy
-
-# Or use different scraper:
-docker compose --profile tools run --rm scraper jetpunk
-docker compose --profile tools run --rm scraper opentdb
-```
-
 ### On Coolify Server
 
 SSH into your Coolify server and run:
 
 ```bash
 # Navigate to your deployed app directory
-cd /path/to/jeopardy
+cd /data/coolify/trextrivia-tools # manual clone of repo (git clone on server)
 
 # Run scraper using the same docker-compose.yml that Coolify deploys
 docker compose --profile tools build scraper

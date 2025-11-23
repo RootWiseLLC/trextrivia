@@ -1,12 +1,18 @@
-import psycopg2
+import os
+import psycopg2  # type: ignore
 
-conn = psycopg2.connect(
-    dbname='postgres',
-    user='postgres',
-    password='postgres',
-    host='localhost',
-    port='5434'
-)
+database_url = os.getenv('DATABASE_URL')
+if database_url:
+    conn = psycopg2.connect(database_url)
+else:
+    conn = psycopg2.connect(
+        dbname='postgres',
+        user='postgres',
+        password='postgres',
+        host='localhost',
+        port='5434'
+    )
+
 db = conn.cursor()
 
 db.execute(

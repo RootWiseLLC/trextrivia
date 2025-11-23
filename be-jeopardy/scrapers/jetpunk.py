@@ -10,8 +10,15 @@ import requests
 from bs4 import BeautifulSoup
 
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+}
+
+
 def output_url_json(url: str, output: str = None):
-    response = requests.get(url)
+    response = requests.get(url, headers=HEADERS)
     if response.status_code != 200:
         print('Failed to fetch the page.')
         return
@@ -27,7 +34,7 @@ def output_url_json(url: str, output: str = None):
 
 
 def get_url_json(url: str):
-    response = requests.get(url)
+    response = requests.get(url, headers=HEADERS)
     if response.status_code != 200:
         print('Failed to fetch the page.')
         return
@@ -145,7 +152,9 @@ if __name__ == '__main__':
     quizzes = []
     for i in range(1, 4):
         response = requests.get(
-            f'https://www.jetpunk.com/search?term=General%20Knowledge&language=english&page={i}')
+            f'https://www.jetpunk.com/search?term=General%20Knowledge&language=english&page={i}',
+            headers=HEADERS,
+        )
 
         if response.status_code != 200:
             print(
@@ -155,7 +164,10 @@ if __name__ == '__main__':
         soup = BeautifulSoup(response.text, 'html.parser')
 
         super_tables = soup.find_all('table', class_='super-table')
-        assert (len(super_tables) == 1)
+        if len(super_tables) != 1:
+            print(
+                f"Unexpected number of super tables ({len(super_tables)}) on page {i}, skipping")
+            continue
 
         super_table = super_tables[0]
         for tr in super_table.find_all('tr'):
