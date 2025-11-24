@@ -537,7 +537,8 @@ func (g *Game) messageAllPlayers(msg string, args ...any) {
 }
 
 func (g *Game) startRound(player GamePlayer) {
-	if os.Getenv("GIN_MODE") == "debug" {
+	// Skip board intro if SKIP_BOARD_INTRO env var is set to "true"
+	if os.Getenv("SKIP_BOARD_INTRO") == "true" {
 		g.setState(RecvPick, player)
 	} else {
 		g.setState(BoardIntro, player)

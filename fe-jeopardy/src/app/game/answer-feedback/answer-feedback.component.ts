@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { GameStateService } from 'src/app/services/game-state.service';
 import { ModalService } from 'src/app/services/modal.service';
+import { SoundService } from 'src/app/services/sound.service';
 
 @Component({
     selector: 'app-answer-feedback',
@@ -15,7 +16,8 @@ export class AnswerFeedbackComponent implements OnInit, OnDestroy {
 
     constructor(
         protected game: GameStateService,
-        protected modal: ModalService
+        protected modal: ModalService,
+        private sound: SoundService
     ) {
         this.correctAudio = new Audio('../../../assets/correct.mp3');
         this.wrongAudio = new Audio('../../../assets/wrong.mp3');
@@ -40,7 +42,11 @@ export class AnswerFeedbackComponent implements OnInit, OnDestroy {
     }
 
     playSound() {
-        // Sound effects are always enabled (independent of background music setting)
+        // Check if sound is enabled before playing
+        if (!this.sound.isSoundEnabled()) {
+            return;
+        }
+
         if (this.isDailyDouble()) {
             this.dailyDoubleAudio.play().catch(err => console.log('Audio play failed:', err));
         } else if (this.isCorrect()) {

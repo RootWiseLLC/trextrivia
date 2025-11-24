@@ -6,6 +6,7 @@ import { GameStateService } from '../services/game-state.service'
 import { JwtService } from '../services/jwt.service'
 import { ModalService } from '../services/modal.service'
 import { PlayerService } from '../services/player.service'
+import { SoundService } from '../services/sound.service'
 import { WebsocketService } from '../services/websocket.service'
 
 const BadRequest = 4400
@@ -39,7 +40,6 @@ export class GameComponent implements OnInit {
 	showPauseGame: boolean = false
 
 	@ViewChild('jeopardyAudio') private jeopardyAudio: ElementRef
-	protected playMusic: boolean = false
 	protected showMusicInfo: boolean = false
 
 	constructor(
@@ -47,6 +47,7 @@ export class GameComponent implements OnInit {
 		private jwt: JwtService,
 		protected game: GameStateService,
 		protected player: PlayerService,
+		protected sound: SoundService,
 		private modal: ModalService,
 		private router: Router,
 		private route: ActivatedRoute,
@@ -160,7 +161,7 @@ export class GameComponent implements OnInit {
 			if (this.game.State() === GameState.RecvWager &&
 			    this.game.FinalRound() &&
 			    previousState !== GameState.RecvWager) {
-				this.startMusic()
+				this.startFinalJeopardyMusic()
 			}
 
 			// Stop music when leaving Final Jeopardy
@@ -168,7 +169,7 @@ export class GameComponent implements OnInit {
 			    this.game.FinalRound() &&
 			    this.game.State() !== GameState.RecvWager &&
 			    this.game.State() !== GameState.RecvAns) {
-				this.stopMusic()
+				this.stopFinalJeopardyMusic()
 			}
 
 			switch (this.game.State()) {
@@ -248,13 +249,29 @@ export class GameComponent implements OnInit {
 		}
 	}
 
-	startMusic(): void {
-		this.playMusic = true
-		this.jeopardyAudio.nativeElement.play()
+	toggleSound(): void {
+		this.sound.toggleSound()
+
+		// Stop Final Jeopardy music if sound is disabled
+		if (!this.sound.isSoundEnabled()) {
+			this.jeopardyAudio.nativeElement.pause()
+		} else if (this.game.FinalRound() &&
+		           (this.game.State() === GameState.RecvWager || this.game.State() === GameState.RecvAns)) {
+			// Restart Final Jeopardy music if we're in Final Jeopardy and sound was just enabled
+			this.jeopardyAudio.nativeElement.play()
+		}
+
+		// Dispatch custom event so board intro component can react to sound toggle
+		window.dispatchEvent(new CustomEvent('soundToggle', { detail: { enabled: this.sound.isSoundEnabled() } }))
 	}
 
-	stopMusic(): void {
-		this.playMusic = false
+	startFinalJeopardyMusic(): void {
+		if (this.sound.isSoundEnabled()) {
+			this.jeopardyAudio.nativeElement.play()
+		}
+	}
+
+	stopFinalJeopardyMusic(): void {
 		this.jeopardyAudio.nativeElement.pause()
 	}
 
