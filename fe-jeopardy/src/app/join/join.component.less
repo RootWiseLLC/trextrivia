@@ -46,8 +46,22 @@
         }
     }
 
-    #game-code {
-        width: calc(100% - 20px);
+    #join-code-panel {
+        gap: 8px;
+
+        label {
+            font-weight: bold;
+        }
+
+        #game-code {
+            flex: 1;
+        }
+
+        .hint {
+            margin: 0;
+            font-size: 0.85em;
+            opacity: 0.75;
+        }
     }
 
     #bots-container {

@@ -13,6 +13,16 @@
                 <button (click)="createPrivateGame(0)">Start a new game</button>
                 <button (click)="toggleJoinCodeInput()">Join game by code</button>
             </div>
+
+            <div id='join-code-panel' class='flex-column' *ngIf="showJoinCodeInput">
+                <label for='game-code'>Enter the code the host shared with you</label>
+                <div class='flex-row gap15'>
+                    <input id="game-code" (keydown.enter)="joinGameByCode()" type="text" [(ngModel)]="joinCode" placeholder="Game code">
+                    <button (click)="joinGameByCode()">Join</button>
+                </div>
+                <p class='hint'>The host can see the code on their "Waiting to start" screen.</p>
+            </div>
+
             <div class='flex-row gap15'>
                 <div class='flex-column game-inputs'>
                     <div>
@@ -28,9 +38,6 @@
                     <div>
                         <button id='advanced-options' (click)="modal.displayConfig()">+</button><span> Advanced options</span>
                     </div>
-                </div>
-                <div>
-                    <input id="game-code" *ngIf="showJoinCodeInput" (keydown.enter)="joinGameByCode()" type="text" [(ngModel)]="joinCode" placeholder="Game code">
                 </div>
             </div>
         </div>

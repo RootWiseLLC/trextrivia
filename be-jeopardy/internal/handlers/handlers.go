@@ -76,11 +76,6 @@ var (
 			Handler: LeaveGame,
 		},
 		{
-			Method:  http.MethodPut,
-			Path:    "/jeopardy/play-again",
-			Handler: PlayAgain,
-		},
-		{
 			Method:  http.MethodGet,
 			Path:    "/jeopardy/private",
 			Handler: GetPrivateGames,
@@ -424,29 +419,6 @@ func PlayGame(c *gin.Context) {
 		closeConnWithMsg(ws, socket.BadRequest, "Unable to play game: %s", err.Error())
 		return
 	}
-}
-
-func PlayAgain(c *gin.Context) {
-	log.Infof("Received play again request")
-
-	token := c.Request.Header.Get("Access-Token")
-	playerId, err := auth.GetJWTSubject(token)
-	if err != nil {
-		log.Errorf(ErrGettingPlayerIdMsg, err.Error())
-		respondWithError(c, http.StatusForbidden, ErrInvalidAuthCredMsg)
-		return
-	}
-
-	if err = jeopardy.PlayAgain(playerId); err != nil {
-		log.Errorf("Error playing again: %s", err.Error())
-		respondWithError(c, http.StatusBadRequest, "Unable to play again: %s", err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, jeopardy.Response{
-		Code:    http.StatusOK,
-		Message: "Asked to play again",
-	})
 }
 
 func LeaveGame(c *gin.Context) {

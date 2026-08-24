@@ -121,6 +121,10 @@ export class GameStateService {
 		return this.game.state == GameState.RecvWager
 	}
 
+	Round(): RoundState {
+		return this.game.round
+	}
+
 	FinalRound(): boolean {
 		return this.game.round == RoundState.FinalRound
 	}

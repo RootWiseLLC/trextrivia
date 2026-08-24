@@ -1,7 +1,7 @@
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { GameState, Ping, Player } from '../model/model'
+import { GameState, Ping, Player, RoundState } from '../model/model'
 import { GameStateService } from '../services/game-state.service'
 import { JwtService } from '../services/jwt.service'
 import { ModalService } from '../services/modal.service'
@@ -31,6 +31,7 @@ function isError(code: number): boolean {
 export class GameComponent implements OnInit {
 	private countdownInterval: NodeJS.Timeout
 	private previousState: GameState
+	private previousRound: RoundState
 	protected joinPath: string
 	protected gameMessage: string
 	protected questionAnswer: string
@@ -106,6 +107,7 @@ export class GameComponent implements OnInit {
 
 			let savedPlayers = this.game.Players()
 			let previousState = this.previousState
+			let previousRound = this.previousRound
 
 			this.game.updateGameState(resp.game)
 			this.player.updatePlayer(resp.curPlayer)
@@ -121,11 +123,18 @@ export class GameComponent implements OnInit {
 				return
 			}
 
-			// Show answer feedback when transitioning from RecvAns to another state (but not in Final Jeopardy)
+			// Going back to RecvBuzz means the question is still live and the other
+			// players can buzz on it, so the answer must stay hidden.
+			const questionOver = this.game.State() !== GameState.RecvBuzz
+
+			// Show answer feedback when transitioning from RecvAns to another state.
+			// The round is checked as of the answer, not as of now - the last question
+			// of a round lands us in Final Jeopardy, and testing the current round
+			// there would swallow the feedback for the question just played.
 			if (previousState === GameState.RecvAns &&
 			    this.game.State() !== GameState.RecvAns &&
 			    this.game.OfficialAnswer() !== '' &&
-			    !this.game.FinalRound()) {
+			    previousRound !== RoundState.FinalRound) {
 				// Determine feedback type based on answer
 				let feedbackType: 'correct' | 'incorrect' | 'timeout' = 'incorrect'
 				const curAnswer = this.game.CurAnswer()
@@ -136,15 +145,17 @@ export class GameComponent implements OnInit {
 					feedbackType = 'correct'
 				}
 
-				this.modal.displayAnswerFeedback(feedbackType)
+				this.modal.displayAnswerFeedback(feedbackType, questionOver)
 			}
 
-			// Show timeout feedback when no one buzzes in (RecvBuzz timeout) - not in Final Jeopardy
+			// Show timeout feedback when no one buzzes in (RecvBuzz timeout).
+			// Leaving RecvBuzz for RecvAns just means someone buzzed in.
 			if (previousState === GameState.RecvBuzz &&
-			    this.game.State() === GameState.RecvPick &&
+			    this.game.State() !== GameState.RecvBuzz &&
+			    this.game.State() !== GameState.RecvAns &&
 			    this.game.OfficialAnswer() !== '' &&
-			    !this.game.FinalRound()) {
-				this.modal.displayAnswerFeedback('timeout')
+			    previousRound !== RoundState.FinalRound) {
+				this.modal.displayAnswerFeedback('timeout', questionOver)
 			}
 
 			// Show Daily Double splash when transitioning to RecvWager (but not Final Jeopardy)
@@ -155,6 +166,7 @@ export class GameComponent implements OnInit {
 			}
 
 			this.previousState = this.game.State()
+			this.previousRound = this.game.Round()
 			this.handleScoreChanges(savedPlayers)
 
 			// Start music when Final Jeopardy begins (transitioning to RecvWager in Final Round)

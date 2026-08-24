@@ -67,17 +67,6 @@ export class PostGameComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	playAgain() {
-		return this.api.PlayAgain().subscribe({
-			next: (resp: any) => {
-			},
-			error: (err: any) => {
-				let msg = err.status != 0 ? err.error.message : ServerUnavailableMsg;
-				this.modal.displayMessage(msg)
-			},
-		})
-	}
-
 	leaveGame() {
 		return this.api.LeaveGame().subscribe({
 			next: (resp: any) => {

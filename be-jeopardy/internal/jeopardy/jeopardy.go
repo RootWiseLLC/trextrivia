@@ -302,45 +302,6 @@ func LeaveGame(playerId string) error {
 	return nil
 }
 
-func PlayAgain(playerId string) error {
-	game, err := GetPlayerGame(playerId)
-	if err != nil {
-		return err
-	}
-
-	player, err := game.getPlayerById(playerId)
-	if err != nil {
-		return err
-	}
-
-	player.setPlayAgain(true)
-
-	restartGame := true
-	for _, p := range game.Players {
-		if !p.playAgain() || p.conn() == nil {
-			restartGame = false
-		}
-	}
-	if restartGame {
-		game.restartChan <- true
-		return nil
-	}
-
-	for _, p := range game.Players {
-		msg := fmt.Sprintf("%s wants to play again", player.name())
-		if p.id() == player.id() {
-			msg = "Waiting for all other players to play again"
-		}
-		_ = p.sendMessage(Response{
-			Code:      socket.Info,
-			Message:   msg,
-			Game:      game,
-			CurPlayer: p,
-		})
-	}
-	return nil
-}
-
 var searchDB *db.JeopardyDB
 var analyticsDB *db.JeopardyDB
 var supabase *db.SupabaseDB

@@ -55,7 +55,6 @@ type (
 	GameChannels struct {
 		msgChan        chan Message
 		disconnectChan chan GamePlayer
-		restartChan    chan bool
 		chatChan       chan ChatMessage
 		reactChan      chan Reaction
 	}
@@ -125,7 +124,6 @@ func NewGame(ctx context.Context, db jeopardyDB, config GameConfig) (*Game, erro
 		GameChannels: GameChannels{
 			msgChan:        make(chan Message),
 			disconnectChan: make(chan GamePlayer),
-			restartChan:    make(chan bool),
 			chatChan:       make(chan ChatMessage),
 			reactChan:      make(chan Reaction),
 		},
@@ -163,8 +161,6 @@ func (g *Game) processMessages() {
 				}
 			case player := <-g.disconnectChan:
 				g.disconnectPlayer(player)
-			case <-g.restartChan:
-				g.restartGame(context.Background())
 			}
 		}
 	}()
@@ -619,7 +615,6 @@ func (g *Game) disconnectPlayer(player GamePlayer) {
 		g.State = PreGame
 	}
 	player.endConnections()
-	player.setPlayAgain(false)
 	g.messageAllPlayers("Player %s disconnected from the game", player.name())
 	endGame := true
 	for _, p := range g.Players {
@@ -631,28 +626,6 @@ func (g *Game) disconnectPlayer(player GamePlayer) {
 		log.Infof("All players disconnected, removing game %s", g.Name)
 		removeGame(g)
 	}
-}
-
-func (g *Game) restartGame(ctx context.Context) {
-	g.State = PreGame
-	g.Round = FirstRound
-	g.LastToPick = &Player{}
-	g.CurQuestion = &Question{}
-	g.OfficialAnswer = ""
-	g.AnsCorrectness = false
-	g.GuessedWrong = []string{}
-	g.Passed = []string{}
-	g.Disputers = 0
-	g.NonDisputers = 0
-	g.NumFinalWagers = 0
-	g.FinalWagers = []string{}
-	g.FinalAnswers = []string{}
-	g.setQuestions(ctx)
-	for _, p := range g.Players {
-		p.resetPlayer()
-	}
-	g.startRound(g.Players[0])
-	g.messageAllPlayers("We are ready to play")
 }
 
 func (g *Game) nextQuestion(ctx context.Context, player GamePlayer, isCorrect bool) {

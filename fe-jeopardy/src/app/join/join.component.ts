@@ -104,10 +104,9 @@ export class JoinComponent implements OnInit {
 	}
 
 	toggleJoinCodeInput() {
-		if (this.showJoinCodeInput && this.joinCode && this.user.name) {
-			this.joinGameByCode()
-			return
-		}
 		this.showJoinCodeInput = !this.showJoinCodeInput
+		if (this.showJoinCodeInput) {
+			setTimeout(() => document.getElementById('game-code')?.focus())
+		}
 	}
 }

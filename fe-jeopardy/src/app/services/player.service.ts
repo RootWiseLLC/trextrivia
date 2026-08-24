@@ -57,10 +57,6 @@ export class PlayerService {
 		return this.player.canDispute;
 	}
 
-	PlayAgain(): boolean {
-		return this.player.playAgain;
-	}
-
 	FinalWager(): number {
 		return this.player.finalWager;
 	}

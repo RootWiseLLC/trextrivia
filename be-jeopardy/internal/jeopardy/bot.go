@@ -162,9 +162,7 @@ func (p *Bot) processMessage(ctx context.Context, resp Response) {
 		}
 		msg.Dispute = true
 		sendMessageAfter(ctx, g, msg, botDisputeTimeout)
-	case PostGame:
-		p.setPlayAgain(true)
-	case PreGame, BoardIntro:
+	case PostGame, PreGame, BoardIntro:
 		return
 	}
 }
@@ -198,7 +196,6 @@ func (p *Bot) copyState(player GamePlayer) {
 	p.FinalWager = player.finalWager()
 	p.FinalCorrect = player.finalCorrect()
 	p.FinalProtestors = player.finalProtestors()
-	p.PlayAgain = player.playAgain()
 }
 
 func (p *Bot) isBot() bool {

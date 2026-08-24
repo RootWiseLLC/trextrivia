@@ -2,7 +2,8 @@
     <h2 *ngIf="game.FinalRound()">Final Question!</h2>
     <p class='question-category'>{{ game.CurCategory() }}</p>
     <div id='wager-input' class='flex-column' *ngIf="player.CanWager()">
-        <input type="number" [(ngModel)]="wagerAmt" placeholder="Enter your wager">
+        <p class='wager-range'>Wager between ${{ MinWager() }} and ${{ MaxWager() }}</p>
+        <input type="number" [min]="MinWager()" [max]="MaxWager()" (keydown.enter)="handleWager()" [(ngModel)]="wagerAmt" placeholder="Enter your wager">
         <button (click)="handleWager()">Wager</button>
     </div>
     <div *ngIf="!game.FinalRound() && !player.CanWager()">

@@ -47,7 +47,6 @@ export type Player = {
     canAnswer: boolean;
     canWager: boolean;
     canDispute: boolean;
-    playAgain: boolean;
     conn: any;
     imgUrl: string;
 };

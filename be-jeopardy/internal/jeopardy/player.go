@@ -35,7 +35,6 @@ type GamePlayer interface {
 	finalWager() int
 	finalCorrect() bool
 	finalProtestors() map[string]bool
-	playAgain() bool
 	isBot() bool
 
 	setId(string)
@@ -51,7 +50,6 @@ type GamePlayer interface {
 	setFinalWager(int)
 	setFinalAnswer(string)
 	setFinalCorrect(bool)
-	setPlayAgain(bool)
 
 	readMessages(msgChan chan Message, disconnectChan chan GamePlayer)
 	processChatMessages(chan ChatMessage)
@@ -67,7 +65,6 @@ type GamePlayer interface {
 	updateScore(val int, isCorrect, penalty bool, round RoundState)
 	addFinalProtestor(string)
 	addToScore(int)
-	resetPlayer()
 	pausePlayer()
 	endConnections()
 
@@ -91,7 +88,6 @@ type Player struct {
 	FinalAnswer     string          `json:"finalAnswer"`
 	FinalCorrect    bool            `json:"finalCorrect"`
 	FinalProtestors map[string]bool `json:"finalProtestors"`
-	PlayAgain       bool            `json:"playAgain"`
 	ImgUrl          string          `json:"imgUrl"`
 
 	Conn         SafeConn `json:"conn"`
@@ -199,16 +195,6 @@ func (p *Player) pausePlayer() {
 	p.CancelWagerTimeout()
 }
 
-func (p *Player) resetPlayer() {
-	p.Score = 0
-	p.updateActions(false, false, false, false)
-	p.FinalWager = 0
-	p.FinalAnswer = ""
-	p.FinalCorrect = false
-	p.FinalProtestors = map[string]bool{}
-	p.PlayAgain = false
-}
-
 func (p *Player) updateActions(pick, buzz, answer, wager bool) {
 	p.CanPick = pick
 	p.CanBuzz = buzz
@@ -289,10 +275,6 @@ func (p *Player) finalProtestors() map[string]bool {
 	return p.FinalProtestors
 }
 
-func (p *Player) playAgain() bool {
-	return p.PlayAgain
-}
-
 func (p *Player) isBot() bool {
 	return false
 }
@@ -347,10 +329,6 @@ func (p *Player) setFinalAnswer(answer string) {
 
 func (p *Player) setFinalCorrect(correct bool) {
 	p.FinalCorrect = correct
-}
-
-func (p *Player) setPlayAgain(playAgain bool) {
-	p.PlayAgain = playAgain
 }
 
 func (p *Player) addFinalProtestor(playerId string) {
