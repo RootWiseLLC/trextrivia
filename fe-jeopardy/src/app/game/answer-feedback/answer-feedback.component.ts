@@ -28,8 +28,10 @@ export class AnswerFeedbackComponent implements OnInit, OnDestroy {
         // Play sound effect based on feedback type
         this.playSound();
 
-        // Auto-hide after 1 second (or 3 seconds for birthday)
-        const hideDelay = this.isBirthday() ? 3000 : 1000;
+        // 1 second is enough for a bare Correct/Incorrect, but not for reading an
+        // answer off the screen, so linger whenever one is actually on show.
+        const revealsAnswer = (this.isIncorrect() || this.isTimeout()) && this.modal.shouldRevealAnswer();
+        const hideDelay = this.isBirthday() || revealsAnswer ? 3000 : 1000;
         this.hideTimeout = setTimeout(() => {
             this.modal.hideAnswerFeedback();
         }, hideDelay);

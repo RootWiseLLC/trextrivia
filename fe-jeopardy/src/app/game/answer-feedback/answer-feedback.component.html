@@ -8,7 +8,10 @@
         </div>
         <div class='feedback-text'>
             <h2 *ngIf="isCorrect()">Correct!</h2>
-            <h2 *ngIf="isIncorrect()">Incorrect</h2>
+            <div *ngIf="isIncorrect()">
+                <h2>Incorrect</h2>
+                <p class='correct-answer' *ngIf="modal.shouldRevealAnswer()">Correct answer: <b>{{ game.OfficialAnswer() }}</b></p>
+            </div>
             <div *ngIf="isTimeout()">
                 <h2>Time's Up!</h2>
                 <p class='correct-answer' *ngIf="modal.shouldRevealAnswer()">Correct answer: <b>{{ game.OfficialAnswer() }}</b></p>

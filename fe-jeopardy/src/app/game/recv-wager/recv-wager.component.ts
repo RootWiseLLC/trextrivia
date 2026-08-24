@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RoundState } from '../../model/model';
 import { GameStateService } from '../../services/game-state.service';
 import { PlayerService } from '../../services/player.service';
@@ -9,7 +9,7 @@ import { WebsocketService } from '../../services/websocket.service';
     templateUrl: './recv-wager.component.html',
     styleUrls: ['./recv-wager.component.less']
 })
-export class RecvWagerComponent implements OnInit {
+export class RecvWagerComponent {
     wagerAmt: string
 
     constructor(
@@ -17,12 +17,6 @@ export class RecvWagerComponent implements OnInit {
         protected game: GameStateService,
         protected player: PlayerService,
     ) { }
-
-    ngOnInit() {
-        if (this.player.CanWager()) {
-            this.wagerAmt = String(this.MaxWager())
-        }
-    }
 
     // The wager range the server enforces. A score below the round's top clue value
     // - including a negative one - still gets the full round maximum to bet with,
