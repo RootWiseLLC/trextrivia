@@ -188,6 +188,10 @@ button.gold:hover {
 
     table {
         border-collapse: collapse;
+        // fixed layout keeps all 6 columns the same width; without it a long
+        // category name widens its column and the board overflows raggedly
+        table-layout: fixed;
+        width: 100%;
 
         td {
             border: 5px solid black;
@@ -197,16 +201,17 @@ button.gold:hover {
             font-weight: bold;
 
             .question-board-box {
-                width: 125px;
+                width: 100%;
                 text-align: center;
                 vertical-align: middle;
                 user-select: none;
+                overflow-wrap: break-word;
             }
         }
 
         .category-title {
             color: white;
-            min-height: 40px;
+            height: 60px;
         }
 
         .question-value {

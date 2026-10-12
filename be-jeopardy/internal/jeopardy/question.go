@@ -2,6 +2,7 @@ package jeopardy
 
 import (
 	"context"
+	"fmt"
 	"math/rand/v2"
 	"strings"
 
@@ -89,24 +90,47 @@ func (g *Game) setQuestions(ctx context.Context) error {
 	}
 	questions = append(questions, randomQuestions...)
 
+	// Questions come back grouped by category, but a category can return more or
+	// fewer than numQuestions rows. Chunking blindly every numQuestions rows shifts
+	// every later category, which puts the wrong title above a column of clues, so
+	// group on the category the question actually belongs to instead.
 	category := Category{}
-	for i, q := range questions {
+	flush := func() {
+		if len(category.Questions) == numQuestions {
+			if category.Questions[0].Round == 1 {
+				g.FirstRound = append(g.FirstRound, category)
+			} else {
+				g.SecondRound = append(g.SecondRound, category)
+			}
+		}
+		category = Category{}
+	}
+	for _, q := range questions {
 		question := &Question{Question: q}
 		if question.Round == 3 {
 			g.FinalQuestion = question
 			continue
 		}
 		question.CanChoose = true
-		category.Questions = append(category.Questions, question)
-		if i%numQuestions == (numQuestions - 1) {
-			category.Title = question.Category
-			if question.Round == 1 {
-				g.FirstRound = append(g.FirstRound, category)
-			} else {
-				g.SecondRound = append(g.SecondRound, category)
-			}
-			category = Category{}
+		startsNewCategory := len(category.Questions) == numQuestions ||
+			(len(category.Questions) > 0 && category.Title != question.Category)
+		if startsNewCategory {
+			flush()
 		}
+		category.Title = question.Category
+		category.Questions = append(category.Questions, question)
+	}
+	flush()
+
+	if len(g.FirstRound) < numCategories {
+		return fmt.Errorf("only got %d complete first round categories, need %d", len(g.FirstRound), numCategories)
+	}
+	if g.FullGame && len(g.SecondRound) < numCategories {
+		return fmt.Errorf("only got %d complete second round categories, need %d", len(g.SecondRound), numCategories)
+	}
+	g.FirstRound = g.FirstRound[:numCategories]
+	if len(g.SecondRound) >= numCategories {
+		g.SecondRound = g.SecondRound[:numCategories]
 	}
 
 	g.setDailyDoubles()
@@ -116,9 +140,13 @@ func (g *Game) setQuestions(ctx context.Context) error {
 
 func (g *Game) setDailyDoubles() {
 	// based on daily_double_occurrence_bounds.sql
-	g.setFirstRoundDailyDouble()
-	g.setSecondRoundDailyDouble()
-	g.setSecondRoundDailyDouble()
+	if len(g.FirstRound) == numCategories {
+		g.setFirstRoundDailyDouble()
+	}
+	if len(g.SecondRound) == numCategories {
+		g.setSecondRoundDailyDouble()
+		g.setSecondRoundDailyDouble()
+	}
 }
 
 func (g *Game) setFirstRoundDailyDouble() {

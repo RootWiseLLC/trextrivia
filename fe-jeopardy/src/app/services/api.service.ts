@@ -72,10 +72,6 @@ export class ApiService {
         return this.post('leave', {})
     }
 
-    PlayAgain(): Observable<any> {
-        return this.put('play-again', {})
-    }
-
     GetAnalytics(): Observable<any> {
         return this.get('analytics')
     }

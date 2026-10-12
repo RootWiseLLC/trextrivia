@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { ServerUnavailableMsg, User } from 'src/app/model/model';
 import { ApiService } from 'src/app/services/api.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { JwtService } from 'src/app/services/jwt.service';
 import { ModalService } from 'src/app/services/modal.service';
 
@@ -29,13 +30,14 @@ export class ConfigComponent {
 	protected categorySearch: string = ''
 	protected searchLoader = false
 	protected questionMode: string = 'cyo'
-	private maxPlayers: number = 6
+	private maxPlayers: number = 3
 
 	constructor(
 		private api: ApiService,
 		private modal: ModalService,
 		private jwt: JwtService,
 		private router: Router,
+		private auth: AuthService,
 	) { }
 
 	searchCategories() {
@@ -122,6 +124,7 @@ export class ConfigComponent {
 			this.firstRoundCategories, this.secondRoundCategories
 		).subscribe({
 			next: (resp: any) => {
+				this.auth.RememberName(this.user.name)
 				this.modal.hideConfig()
 				this.jwt.SetJWT(resp.token)
 				this.router.navigate([`/game/${resp.game.name}`])

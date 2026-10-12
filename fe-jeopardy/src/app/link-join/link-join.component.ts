@@ -38,6 +38,7 @@ export class LinkJoinComponent {
     joinGame() {
         this.api.JoinGameByCode(this.user.name, this.user.imgUrl, this.user.email, this.joinCode).subscribe({
             next: (resp: any) => {
+                this.auth.RememberName(this.user.name);
                 this.jwt.SetJWT(resp.token);
                 this.router.navigate([`/game/${resp.game.name}`]);
             },
