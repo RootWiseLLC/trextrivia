@@ -6,6 +6,8 @@ import { User } from '../model/model';
 import { SupabaseService } from './supabase.service';
 import { formattedDate } from './utils';
 
+const playerNameKey = 'playerName'
+
 @Injectable({
 	providedIn: 'root'
 })
@@ -18,11 +20,27 @@ export class AuthService {
 			email: '',
 			imgUrl: '',
 			authenticated: false,
-			name: '',
+			name: this.savedName(),
 			dateJoined: '',
 			public: false,
 		});
 		this.user = this.userSubject.asObservable();
+	}
+
+	// Guests get their last-used name prefilled. Storage can be unavailable
+	// (private windows, blocked site data), which just means no prefill.
+	private savedName(): string {
+		try {
+			return localStorage.getItem(playerNameKey) ?? ''
+		} catch {
+			return ''
+		}
+	}
+
+	public RememberName(name: string) {
+		try {
+			localStorage.setItem(playerNameKey, name.trim())
+		} catch { }
 	}
 
 	public async UpdateUserName(name: string): Promise<Error | null> {

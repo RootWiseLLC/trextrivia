@@ -116,7 +116,7 @@ const (
 	FinalRound
 )
 
-var maxPlayers = 6
+var maxPlayers = 3
 
 func NewGame(ctx context.Context, db jeopardyDB, config GameConfig) (*Game, error) {
 	game := &Game{

@@ -126,12 +126,16 @@ export class GameComponent implements OnInit {
 			// Going back to RecvBuzz means the question is still live and the other
 			// players can buzz on it, so the answer must stay hidden.
 			const questionOver = this.game.State() !== GameState.RecvBuzz
+			// A disconnect pauses the game into PreGame mid-question. The question
+			// resumes afterwards, so that is not the end of it and gets no feedback.
+			const paused = this.game.IsPaused()
 
 			// Show answer feedback when transitioning from RecvAns to another state.
 			// The round is checked as of the answer, not as of now - the last question
 			// of a round lands us in Final Jeopardy, and testing the current round
 			// there would swallow the feedback for the question just played.
-			if (previousState === GameState.RecvAns &&
+			if (!paused &&
+			    previousState === GameState.RecvAns &&
 			    this.game.State() !== GameState.RecvAns &&
 			    this.game.OfficialAnswer() !== '' &&
 			    previousRound !== RoundState.FinalRound) {
@@ -150,7 +154,8 @@ export class GameComponent implements OnInit {
 
 			// Show timeout feedback when no one buzzes in (RecvBuzz timeout).
 			// Leaving RecvBuzz for RecvAns just means someone buzzed in.
-			if (previousState === GameState.RecvBuzz &&
+			if (!paused &&
+			    previousState === GameState.RecvBuzz &&
 			    this.game.State() !== GameState.RecvBuzz &&
 			    this.game.State() !== GameState.RecvAns &&
 			    this.game.OfficialAnswer() !== '' &&
@@ -168,6 +173,15 @@ export class GameComponent implements OnInit {
 			this.previousState = this.game.State()
 			this.previousRound = this.game.Round()
 			this.handleScoreChanges(savedPlayers)
+
+			// Play the theme while a round's categories are revealed, and stop it
+			// once the board intro hands over to the first pick.
+			if (this.game.State() === GameState.BoardIntro && previousState !== GameState.BoardIntro) {
+				this.startMusic()
+			}
+			if (previousState === GameState.BoardIntro && this.game.State() !== GameState.BoardIntro) {
+				this.stopFinalJeopardyMusic()
+			}
 
 			// Start music when Final Jeopardy begins (transitioning to RecvWager in Final Round)
 			if (this.game.State() === GameState.RecvWager &&
@@ -267,9 +281,10 @@ export class GameComponent implements OnInit {
 		// Stop Final Jeopardy music if sound is disabled
 		if (!this.sound.isSoundEnabled()) {
 			this.jeopardyAudio.nativeElement.pause()
-		} else if (this.game.FinalRound() &&
-		           (this.game.State() === GameState.RecvWager || this.game.State() === GameState.RecvAns)) {
-			// Restart Final Jeopardy music if we're in Final Jeopardy and sound was just enabled
+		} else if (this.game.State() === GameState.BoardIntro ||
+		           (this.game.FinalRound() &&
+		            (this.game.State() === GameState.RecvWager || this.game.State() === GameState.RecvAns))) {
+			// Resume the music if sound was just enabled during the board intro or Final Jeopardy
 			this.jeopardyAudio.nativeElement.play()
 		}
 
@@ -278,8 +293,14 @@ export class GameComponent implements OnInit {
 	}
 
 	startFinalJeopardyMusic(): void {
+		this.startMusic()
+	}
+
+	// Always starts from the top, since the same track also plays during board intros.
+	private startMusic(): void {
 		if (this.sound.isSoundEnabled()) {
-			this.jeopardyAudio.nativeElement.play()
+			this.jeopardyAudio.nativeElement.currentTime = 0
+			this.jeopardyAudio.nativeElement.play().catch(() => { })
 		}
 	}
 

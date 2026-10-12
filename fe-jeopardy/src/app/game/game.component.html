@@ -25,14 +25,16 @@
 
 <app-reactions></app-reactions>
 
+<!-- Outside any *ngIf so it exists the moment the board intro starts -->
+<audio loop #jeopardyAudio>
+	<source src="../../assets/jeopardy_music.mp3" />
+</audio>
+
 <div id='game-controls'>
 	<!-- Sound control visible throughout entire game -->
 	<div id='sound-control' *ngIf="!game.PreGame()" class='game-control'>
 		<ion-icon (click)="toggleSound()" *ngIf="sound.isSoundEnabled()" name="volume-high-outline"></ion-icon>
 		<ion-icon (click)="toggleSound()" *ngIf="!sound.isSoundEnabled()" name="volume-mute-outline"></ion-icon>
-		<audio loop #jeopardyAudio>
-			<source src="../../assets/jeopardy_music.mp3" />
-		</audio>
 	</div>
 
 	<div id='pause-game' *ngIf='!game.InDispute() && !game.PreGame()' class='game-control'>

@@ -16,9 +16,10 @@ import { environment } from '../../environments/environment'
 export class JoinComponent implements OnInit {
 	protected user: User
 	protected joinCode: string = ''
-	protected showJoinCodeInput: boolean = false
-	protected oneRoundChecked: boolean = true
-	protected twoRoundChecked: boolean = false
+	protected nameInvalid: boolean = false
+	protected showDedication: boolean = environment.showBirthdayMessage
+	protected oneRoundChecked: boolean = false
+	protected twoRoundChecked: boolean = true
 	protected penaltyChecked: boolean = true
 
 	constructor(
@@ -33,18 +34,12 @@ export class JoinComponent implements OnInit {
 		this.auth.user.subscribe(user => {
 			this.user = user
 		})
-
-		// Show birthday message for Tera (if enabled in environment config)
-		if (environment.showBirthdayMessage) {
-			setTimeout(() => {
-				this.modal.displayAnswerFeedback('birthday')
-			}, 500)
-		}
 	}
 
 	private joinResp(): Partial<Observer<any>> {
 		return {
 			next: (resp: any) => {
+				this.auth.RememberName(this.user.name)
 				this.jwt.SetJWT(resp.token)
 				this.router.navigate([`/game/${resp.game.name}`])
 			},
@@ -56,11 +51,16 @@ export class JoinComponent implements OnInit {
 	}
 
 	private showInvalidName() {
-		document.getElementById('player-name-join')!.focus()
-		document.getElementById('player-name-join')!.style.border = '1px solid red';
+		document.getElementById('player-name-join')?.focus()
+		this.nameInvalid = true
 		setTimeout(() => {
-			document.getElementById('player-name-join')!.style.border = '1px solid grey';
+			this.nameInvalid = false
 		}, 1000)
+	}
+
+	setRounds(rounds: number) {
+		this.oneRoundChecked = rounds == 1
+		this.twoRoundChecked = rounds == 2
 	}
 
 	createPrivateGame(bots: number) {
@@ -101,12 +101,5 @@ export class JoinComponent implements OnInit {
 				this.modal.displayMessage(msg)
 			},
 		})
-	}
-
-	toggleJoinCodeInput() {
-		this.showJoinCodeInput = !this.showJoinCodeInput
-		if (this.showJoinCodeInput) {
-			setTimeout(() => document.getElementById('game-code')?.focus())
-		}
 	}
 }
