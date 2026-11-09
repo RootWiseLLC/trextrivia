@@ -1,16 +1,35 @@
-with r1_categories as (
-	select category, air_date, round
+-- A category is only usable when its five clues carry the exact slot values for the
+-- round, and its round has all 30 clues. The scraper assigned categories by counting
+-- clues, so a missing clue shifted every later clue in that round into the wrong
+-- category. Those categories can still look complete, so the whole round is skipped.
+with full_rounds as (
+	select air_date, round
 	from jeopardy_clues
-	group by category, air_date, round
-	having count(*) = 5 and round = 1
+	where round in (1, 2)
+	group by air_date, round
+	having count(*) = 30
+),
+valid_categories as (
+	select jc.category, jc.air_date, jc.round
+	from jeopardy_clues as jc
+	join full_rounds as fr on jc.air_date = fr.air_date and jc.round = fr.round
+	group by jc.category, jc.air_date, jc.round
+	having array_agg(jc.clue_value order by jc.clue_value) =
+		case when jc.round = 1
+			then array[200, 400, 600, 800, 1000]
+			else array[400, 800, 1200, 1600, 2000] end
+),
+r1_categories as (
+	select category, air_date, round
+	from valid_categories
+	where round = 1
 	order by random() asc
 	limit $1
 ),
 r2_categories as (
 	select category, air_date, round
-	from jeopardy_clues
-	group by category, air_date, round
-	having count(*) = 5 and round = 2
+	from valid_categories
+	where round = 2
 	order by random() asc
 	limit $2
 ),

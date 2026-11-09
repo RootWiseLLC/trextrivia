@@ -16,6 +16,7 @@ export class ModalService {
 	answerFeedback: boolean
 	answerFeedbackType: 'correct' | 'incorrect' | 'timeout' | 'daily-double' = 'correct'
 	answerFeedbackRevealAnswer: boolean = true
+	answerFeedbackAnswer: string = ''
 
 	constructor(private game: GameStateService) { }
 
@@ -150,9 +151,11 @@ export class ModalService {
 
 	// revealAnswer is false while the question is still live - other players can
 	// still buzz on it, so showing them the answer would hand them the point.
-	displayAnswerFeedback(type: 'correct' | 'incorrect' | 'timeout' | 'daily-double' = 'correct', revealAnswer: boolean = true) {
+	displayAnswerFeedback(type: 'correct' | 'incorrect' | 'timeout' | 'daily-double' = 'correct', revealAnswer: boolean = true, answer: string = '') {
 		this.answerFeedbackType = type
 		this.answerFeedbackRevealAnswer = revealAnswer
+		// Captured now, because the game state can move on while the popup is up.
+		this.answerFeedbackAnswer = answer
 		this.answerFeedback = true
 	}
 
@@ -170,5 +173,9 @@ export class ModalService {
 
 	shouldRevealAnswer(): boolean {
 		return this.answerFeedbackRevealAnswer
+	}
+
+	feedbackAnswer(): string {
+		return this.answerFeedbackAnswer
 	}
 }

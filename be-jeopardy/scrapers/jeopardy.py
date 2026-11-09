@@ -55,18 +55,21 @@ def scrape_game(path):
             print(f'Skipping game with unexpected category count: {game_url}')
             return []
         clues = rnd.find_all('td', class_='clue')
-        col = 0
-        for clue in clues:
-            val = clue.find('td', class_='clue_value')
+        # The board has one td.clue per cell in row order, including empty cells for
+        # clues that were never revealed. Category and value come from the cell's
+        # position. Counting only the kept clues shifts every clue after a gap into the
+        # wrong category, and reading the value text gives a Daily Double's wager.
+        base_value = 200 if rnd_num == 1 else 400
+        for idx, clue in enumerate(clues):
+            row, col = divmod(idx, 6)
+            val = base_value * (row + 1)
             daily_double = False
-            if val is None:
-                val = clue.find('td', class_='clue_value_daily_double')
-                if val is None:
-                    continue
-                val = int("".join(re.findall(r'\d+', val.text)))
+            dd_val = clue.find('td', class_='clue_value_daily_double')
+            if dd_val is not None:
                 daily_double = True
-            else:
-                val = int("".join(re.findall(r'\d+', val.text)))
+                dd_val = int("".join(re.findall(r'\d+', dd_val.text)))
+            elif clue.find('td', class_='clue_value') is None:
+                continue
             texts = clue.find_all('td', class_='clue_text')
             if len(texts) != 2:
                 continue
@@ -74,7 +77,7 @@ def scrape_game(path):
             extracted.append({
                 'round': rnd_num,
                 'clue_value': val,
-                'daily_double_value': val if daily_double else 0,
+                'daily_double_value': dd_val if daily_double else 0,
                 'category': categories[col],
                 'comments': category_comments[col],
                 'answer': answer.text,
@@ -82,7 +85,6 @@ def scrape_game(path):
                 'air_date': air_date,
                 'notes': ''
             })
-            col = (col+1) % 6
         rnd_num += 1
 
     for ft in final_tables:

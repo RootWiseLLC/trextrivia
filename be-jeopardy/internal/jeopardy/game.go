@@ -513,7 +513,14 @@ func (g *Game) setState(state GameState, player GamePlayer) {
 			p.setCanDispute(p.id() != player.id())
 		}
 		g.startDisputeTimeout()
-	case PreGame, PostGame:
+	case PostGame:
+		if g.Round == FinalRound {
+			g.OfficialAnswer = g.FinalQuestion.Answer
+		}
+		for _, p := range g.Players {
+			p.updateActions(false, false, false, false)
+		}
+	case PreGame:
 		for _, p := range g.Players {
 			p.updateActions(false, false, false, false)
 		}
@@ -551,7 +558,8 @@ func (g *Game) startFinalRound(ctx context.Context) {
 	g.Round = FinalRound
 	g.resetGuesses()
 	g.CurQuestion = g.FinalQuestion
-	g.OfficialAnswer = g.CurQuestion.Answer
+	// OfficialAnswer still holds the answer to the last board clue, which the client
+	// shows in its feedback popup. The Final answer is only published at PostGame.
 	g.NumFinalWagers = g.numFinalWagers()
 	if g.NumFinalWagers < 2 {
 		g.setState(PostGame, &Player{})

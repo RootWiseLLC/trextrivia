@@ -42,24 +42,38 @@ type (
 )
 
 func (q *Question) checkAnswer(ans string) bool {
+	ans = strings.ToLower(ans)
 	for _, corr := range q.Alternatives {
-		ans, corr = strings.ToLower(ans), strings.ToLower(corr)
-		dist := levenshtein.ComputeDistance(ans, corr)
-		if len(corr) <= 5 && dist <= 0 {
+		if closeEnough(ans, strings.ToLower(corr)) {
 			return true
-		} else if 5 < len(corr) && len(corr) <= 7 && dist <= 1 {
-			return true
-		} else if 7 < len(corr) && len(corr) <= 9 && dist <= 2 {
-			return true
-		} else if 9 < len(corr) && len(corr) <= 12 && dist <= 3 {
-			return true
-		} else if 12 < len(corr) && len(corr) <= 15 && dist <= 4 {
-			return true
-		} else if 15 < len(corr) && dist <= 5 {
-			return true
+		}
+		// For a person's name, the surname alone also counts.
+		for _, form := range surnameForms(corr) {
+			if closeEnough(ans, strings.ToLower(form)) {
+				return true
+			}
 		}
 	}
 	return false
+}
+
+// closeEnough allows more typos the longer the correct answer is.
+func closeEnough(ans, corr string) bool {
+	dist := levenshtein.ComputeDistance(ans, corr)
+	switch n := len(corr); {
+	case n <= 5:
+		return dist == 0
+	case n <= 7:
+		return dist <= 1
+	case n <= 9:
+		return dist <= 2
+	case n <= 12:
+		return dist <= 3
+	case n <= 15:
+		return dist <= 4
+	default:
+		return dist <= 5
+	}
 }
 
 func (q *Question) equal(q0 *Question) bool {

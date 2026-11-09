@@ -149,7 +149,7 @@ export class GameComponent implements OnInit {
 					feedbackType = 'correct'
 				}
 
-				this.modal.displayAnswerFeedback(feedbackType, questionOver)
+				this.modal.displayAnswerFeedback(feedbackType, questionOver, this.game.OfficialAnswer())
 			}
 
 			// Show timeout feedback when no one buzzes in (RecvBuzz timeout).
@@ -160,7 +160,7 @@ export class GameComponent implements OnInit {
 			    this.game.State() !== GameState.RecvAns &&
 			    this.game.OfficialAnswer() !== '' &&
 			    previousRound !== RoundState.FinalRound) {
-				this.modal.displayAnswerFeedback('timeout', questionOver)
+				this.modal.displayAnswerFeedback('timeout', questionOver, this.game.OfficialAnswer())
 			}
 
 			// Show Daily Double splash when transitioning to RecvWager (but not Final Jeopardy)

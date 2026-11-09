@@ -9,11 +9,11 @@
             <h2 *ngIf="isCorrect()">Correct!</h2>
             <div *ngIf="isIncorrect()">
                 <h2>Incorrect</h2>
-                <p class='correct-answer' *ngIf="modal.shouldRevealAnswer()">Correct answer: <b>{{ game.OfficialAnswer() }}</b></p>
+                <p class='correct-answer' *ngIf="modal.shouldRevealAnswer()">Correct answer: <b>{{ modal.feedbackAnswer() }}</b></p>
             </div>
             <div *ngIf="isTimeout()">
                 <h2>Time's Up!</h2>
-                <p class='correct-answer' *ngIf="modal.shouldRevealAnswer()">Correct answer: <b>{{ game.OfficialAnswer() }}</b></p>
+                <p class='correct-answer' *ngIf="modal.shouldRevealAnswer()">Correct answer: <b>{{ modal.feedbackAnswer() }}</b></p>
             </div>
             <h2 *ngIf="isDailyDouble()">Daily Double!</h2>
         </div>
