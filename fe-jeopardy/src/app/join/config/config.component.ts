@@ -21,7 +21,7 @@ export class ConfigComponent {
 	}
 	protected botConfig: number = 0
 	protected pickConfig: number = 30
-	protected buzzConfig: number = 20
+	protected buzzConfig: number = 15
 	protected answerConfig: number = 15
 	protected wagerConfig: number = 30
 	protected firstRoundCategories: any[] = []
