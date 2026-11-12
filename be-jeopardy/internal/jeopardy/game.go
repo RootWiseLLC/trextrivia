@@ -48,6 +48,10 @@ type (
 		NonDisputers   int          `json:"nonDisputes"`
 		imgOffset      int
 
+		// Seconds left to look over the round's last clue before the next round
+		// starts. Non-zero only while the board is done but the game is still in RecvPick.
+		RoundReviewTimeout int `json:"roundReviewTimeout"`
+
 		StartFinalAnswerCountdown bool `json:"startFinalAnswerCountdown"`
 		StartFinalWagerCountdown  bool `json:"startFinalWagerCountdown"`
 	}
@@ -470,6 +474,16 @@ func (g *Game) setState(state GameState, player GamePlayer) {
 		}
 		g.startBoardIntroTimeout()
 	case RecvPick:
+		if g.Round != FinalRound && g.roundEnded() {
+			// Nothing left to pick. Hold here so players can read the last clue's
+			// answer and dispute it, then move on to the next round.
+			for _, p := range g.Players {
+				p.updateActions(false, false, false, false)
+			}
+			g.startRoundReviewTimeout()
+			break
+		}
+		g.RoundReviewTimeout = 0
 		for _, p := range g.Players {
 			p.updateActions(p.id() == player.id(), false, false, false)
 		}
@@ -613,6 +627,9 @@ func (g *Game) resumeGame() {
 	} else {
 		player = &Player{}
 	}
+	if player == nil {
+		player = &Player{}
+	}
 	g.setState(state, player)
 }
 
@@ -646,7 +663,8 @@ func (g *Game) nextQuestion(ctx context.Context, player GamePlayer, isCorrect bo
 	}
 	var msg string
 	if g.roundEnded() {
-		g.handleRoundEnd(ctx)
+		g.resetGuesses()
+		g.setState(RecvPick, player)
 		msg = "Round ended"
 	} else if g.noPlayerCanBuzz() {
 		g.resetGuesses()
@@ -669,7 +687,8 @@ func (g *Game) skipQuestion(ctx context.Context) {
 	var msg string
 	g.disableQuestion()
 	if g.roundEnded() {
-		g.handleRoundEnd(ctx)
+		g.resetGuesses()
+		g.setState(RecvPick, g.LastToPick)
 		msg = "Round ended"
 	} else {
 		g.resetGuesses()
@@ -728,6 +747,7 @@ func (g *Game) roundEnded() bool {
 }
 
 func (g *Game) handleRoundEnd(ctx context.Context) {
+	g.RoundReviewTimeout = 0
 	if g.Round == FirstRound {
 		g.FirstRoundScore = g.getAvgScore()
 	} else if g.Round == SecondRound {

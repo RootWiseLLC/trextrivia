@@ -32,6 +32,8 @@ export type Game = {
     wagerTimeout: number;
     finalAnswerTimeout: number;
     finalWagerTimeout: number;
+    roundReviewTimeout: number;
+    fullGame: boolean;
 };
 
 export type Player = {
