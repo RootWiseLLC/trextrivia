@@ -183,17 +183,14 @@ export class GameComponent implements OnInit {
 				this.stopFinalJeopardyMusic()
 			}
 
-			// Start music when Final Jeopardy begins (transitioning to RecvWager in Final Round)
-			if (this.game.State() === GameState.RecvWager &&
+			// The think music plays while players write their Final answer.
+			if (this.game.State() === GameState.RecvAns &&
 			    this.game.FinalRound() &&
-			    previousState !== GameState.RecvWager) {
+			    previousState !== GameState.RecvAns) {
 				this.startFinalJeopardyMusic()
 			}
-
-			// Stop music when leaving Final Jeopardy
-			if (previousState === GameState.RecvWager &&
-			    this.game.FinalRound() &&
-			    this.game.State() !== GameState.RecvWager &&
+			if (previousState === GameState.RecvAns &&
+			    previousRound === RoundState.FinalRound &&
 			    this.game.State() !== GameState.RecvAns) {
 				this.stopFinalJeopardyMusic()
 			}
@@ -209,7 +206,7 @@ export class GameComponent implements OnInit {
 					this.modal.displayDispute()
 					break
 				case GameState.RecvPick:
-					this.startCountdownTimer(this.game.PickTimeout())
+					this.startCountdownTimer(this.game.InRoundReview() ? this.game.RoundReviewTimeout() : this.game.PickTimeout())
 					break
 				case GameState.RecvBuzz:
 					this.cancelCountdown()
@@ -282,9 +279,8 @@ export class GameComponent implements OnInit {
 		if (!this.sound.isSoundEnabled()) {
 			this.jeopardyAudio.nativeElement.pause()
 		} else if (this.game.State() === GameState.BoardIntro ||
-		           (this.game.FinalRound() &&
-		            (this.game.State() === GameState.RecvWager || this.game.State() === GameState.RecvAns))) {
-			// Resume the music if sound was just enabled during the board intro or Final Jeopardy
+		           (this.game.FinalRound() && this.game.State() === GameState.RecvAns)) {
+			// Resume the music if sound was just enabled during the board intro or the Final answer
 			this.jeopardyAudio.nativeElement.play()
 		}
 

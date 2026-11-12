@@ -9,6 +9,9 @@ import (
 
 const boardIntroTimeout = 27
 
+// How long the board stays up after a round's last clue.
+const roundReviewTimeout = 8
+
 type GameTimeouts struct {
 	cancelBoardIntroTimeout context.CancelFunc
 	cancelPickTimeout       context.CancelFunc
@@ -45,6 +48,20 @@ func (g *Game) startBoardIntroTimeout() {
 		return nil
 	})
 
+}
+
+// Uses cancelPickTimeout, so pausing the game or starting a dispute stops it
+// the same way they stop a pick timer.
+func (g *Game) startRoundReviewTimeout() {
+	timeout := roundReviewTimeout
+	g.RoundReviewTimeout = timeout
+	ctx, cancel := context.WithCancel(context.Background())
+	g.cancelPickTimeout = cancel
+	g.startTimeout(ctx, timeout, &Player{}, func(_ GamePlayer) error {
+		g.handleRoundEnd(context.Background())
+		g.messageAllPlayers("Next round")
+		return nil
+	})
 }
 
 func (g *Game) startPickTimeout(player GamePlayer) {

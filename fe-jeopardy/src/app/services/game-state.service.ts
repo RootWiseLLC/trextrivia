@@ -278,4 +278,18 @@ export class GameStateService {
 	FinalWagerTimeout(): number {
 		return this.game.finalWagerTimeout
 	}
+
+	// Seconds the board stays up after a round's last clue; 0 during normal play.
+	RoundReviewTimeout(): number {
+		return this.game.roundReviewTimeout || 0
+	}
+
+	// What comes after the board that just finished.
+	NextRoundName(): string {
+		return this.game.fullGame && this.game.round == RoundState.FirstRound ? 'The second round' : 'Final Trivia'
+	}
+
+	InRoundReview(): boolean {
+		return this.RecvPick() && this.RoundReviewTimeout() > 0
+	}
 }

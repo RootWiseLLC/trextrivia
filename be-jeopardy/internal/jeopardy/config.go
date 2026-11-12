@@ -58,7 +58,7 @@ func NewConfig(
 		AnswerTimeout:         answerTimeout,
 		WagerTimeout:          wagerTimeout,
 		FinalWagerTimeout:     30,
-		FinalAnswerTimeout:    30,
+		FinalAnswerTimeout:    45,
 		DisputeTimeout:        60,
 		FirstRoundCategories:  firstRoundCategories,
 		SecondRoundCategories: secondRoundCategories,
